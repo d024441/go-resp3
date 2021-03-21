@@ -1,18 +1,6 @@
-/*
-Copyright 2019 Stefan Miller
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
+// SPDX-FileCopyrightText: 2019-2021 Stefan Miller
+//
+// SPDX-License-Identifier: Apache-2.0
 
 package main
 
@@ -263,17 +251,19 @@ func (g *generator) generatePointerType(name, cmd string, nilTest bool, fieldTyp
 	g.generateField(name, "", true, true, fieldType)
 }
 
-func (g *generator) generateSliceType(name, cmd string, allowNil bool, sliceCmd string, fieldType ast.TypeNode) {
-	if allowNil && cmd != "" {
+func (g *generator) generateSliceType(name, cmd string, allowNil, variadic bool, fieldType ast.TypeNode) {
+	if allowNil && variadic && cmd != "" {
+		// only needed in case a command would be written
+		// otherwise an 'empty' for would be ok and we can save a if
 		g.b.startBlock("if ", name, " != nil")
 		defer g.b.endBlock()
 	}
-	if cmd != "" {
+	if variadic && cmd != "" {
 		g.b.add(strconv.Quote(cmd))
 	}
 	g.b.startBlock("for _, v := range ", name)
-	if sliceCmd != "" {
-		g.b.add(strconv.Quote(sliceCmd))
+	if !variadic && cmd != "" { // multiple
+		g.b.add(strconv.Quote(cmd))
 	}
 	g.generateField("v", "", true, false, fieldType)
 	g.b.endBlock()
@@ -292,7 +282,7 @@ func (g *generator) generateField(name, cmd string, nilTest, ptr bool, node ast.
 	case *ast.PointerType:
 		g.generatePointerType(name, cmd, nilTest, node.Node)
 	case *ast.SliceType:
-		g.generateSliceType(name, cmd, node.AllowNil, node.Cmd, node.Node)
+		g.generateSliceType(name, cmd, node.AllowNil, node.Variadic, node.Node)
 	case *ast.EllipsisType:
 		g.generateEllipsisType(name, cmd, node.Node)
 	case *ast.BaseType:

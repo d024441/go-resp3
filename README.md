@@ -1,7 +1,8 @@
 # go-resp3
 
-[![GoDoc](https://godoc.org/github.com/stfnmllr/go-resp3/client?status.png)](https://godoc.org/github.com/stfnmllr/go-resp3/client)
+[![Go Reference](https://pkg.go.dev/badge/github.com/stfnmllr/go-resp3/client.svg)](https://pkg.go.dev/github.com/stfnmllr/go-resp3/client)
 [![Go Report Card](https://goreportcard.com/badge/github.com/stfnmllr/go-resp3)](https://goreportcard.com/report/github.com/stfnmllr/go-resp3)
+[![REUSE status](https://api.reuse.software/badge/git.fsfe.org/reuse/api)](https://api.reuse.software/info/git.fsfe.org/reuse/api)
 ![](https://github.com/stfnmllr/go-resp3/workflows/build/badge.svg)
 ![](https://github.com/stfnmllr/go-resp3/workflows/test/badge.svg)
 
@@ -18,11 +19,11 @@ go get github.com/stfnmllr/go-resp3/client
 
 ## Building
 
-To build go-resp3 you need to have a working Go environment with [version 1.14.x or higher installed](https://golang.org/dl/).
+To build go-resp3 you need to have a working Go environment with [version 1.15.x or higher installed](https://golang.org/dl/).
 
 ## Documentation
 
-API documentation and documented examples can be found at <https://godoc.org/github.com/stfnmllr/go-resp3/client>.
+API documentation and documented examples can be found at <https://pkg.go.dev/github.com/stfnmllr/go-resp3/client>.
 
 ## Tests
 

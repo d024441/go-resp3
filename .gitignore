@@ -19,3 +19,5 @@ redis-doc/
 *.ast
 *.prof
 *.txt
+!LICENSES/*.txt
+.reuse/*

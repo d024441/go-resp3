@@ -2154,7 +2154,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": false,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "baseType",
 						"name": "string"
@@ -2322,7 +2322,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": true,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "baseType",
 						"name": "string"
@@ -2512,7 +2512,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": false,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "baseType",
 						"name": "interface{}"
@@ -2641,7 +2641,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": false,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "baseType",
 						"name": "interface{}"
@@ -2706,7 +2706,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": false,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "baseType",
 						"name": "interface{}"
@@ -2741,7 +2741,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": false,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "baseType",
 						"name": "interface{}"
@@ -2819,7 +2819,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": false,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "baseType",
 						"name": "interface{}"
@@ -2853,7 +2853,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": false,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "baseType",
 						"name": "interface{}"
@@ -2925,7 +2925,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": false,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "baseType",
 						"name": "interface{}"
@@ -2959,7 +2959,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": false,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "baseType",
 						"name": "interface{}"
@@ -3222,7 +3222,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": true,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "baseType",
 						"name": "string"
@@ -3338,7 +3338,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": false,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "baseType",
 						"name": "int64"
@@ -3417,7 +3417,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": false,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "baseType",
 						"name": "int64"
@@ -3900,7 +3900,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": false,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "baseType",
 						"name": "interface{}"
@@ -3926,7 +3926,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": false,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "baseType",
 						"name": "string"
@@ -4115,7 +4115,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": false,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "baseType",
 						"name": "interface{}"
@@ -4229,7 +4229,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": false,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "baseType",
 						"name": "interface{}"
@@ -4243,7 +4243,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": false,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "baseType",
 						"name": "interface{}"
@@ -4286,7 +4286,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": false,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "baseType",
 						"name": "interface{}"
@@ -4300,7 +4300,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": false,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "baseType",
 						"name": "interface{}"
@@ -4335,7 +4335,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": false,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "baseType",
 						"name": "interface{}"
@@ -4495,7 +4495,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": false,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "dataType",
 						"name": "LongitudeLatitudeMember"
@@ -4579,7 +4579,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": false,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "baseType",
 						"name": "interface{}"
@@ -4613,7 +4613,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": false,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "baseType",
 						"name": "interface{}"
@@ -5058,7 +5058,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": false,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "baseType",
 						"name": "interface{}"
@@ -5330,7 +5330,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": false,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "baseType",
 						"name": "interface{}"
@@ -5425,7 +5425,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": false,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "dataType",
 						"name": "FieldValue"
@@ -5768,7 +5768,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": true,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "baseType",
 						"name": "string"
@@ -6042,7 +6042,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": false,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "baseType",
 						"name": "interface{}"
@@ -6076,7 +6076,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": false,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "baseType",
 						"name": "interface{}"
@@ -6341,7 +6341,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": false,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "baseType",
 						"name": "interface{}"
@@ -6445,7 +6445,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": true,
-					"cmd": "",
+					"variadic": true,
 					"node": {
 						"_type": "baseType",
 						"name": "interface{}"
@@ -6500,7 +6500,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": true,
-					"cmd": "",
+					"variadic": true,
 					"node": {
 						"_type": "baseType",
 						"name": "string"
@@ -6585,7 +6585,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": false,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "dataType",
 						"name": "KeyValue"
@@ -6610,7 +6610,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": false,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "dataType",
 						"name": "KeyValue"
@@ -6888,7 +6888,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": false,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "baseType",
 						"name": "interface{}"
@@ -6913,7 +6913,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": false,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "baseType",
 						"name": "interface{}"
@@ -6947,7 +6947,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": false,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "baseType",
 						"name": "interface{}"
@@ -7003,7 +7003,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": false,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "baseType",
 						"name": "string"
@@ -7130,7 +7130,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": false,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "baseType",
 						"name": "string"
@@ -7155,7 +7155,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": true,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "baseType",
 						"name": "string"
@@ -7468,7 +7468,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": false,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "baseType",
 						"name": "interface{}"
@@ -7502,7 +7502,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": false,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "baseType",
 						"name": "interface{}"
@@ -7536,7 +7536,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": false,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "baseType",
 						"name": "interface{}"
@@ -7693,7 +7693,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": false,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "baseType",
 						"name": "string"
@@ -7761,7 +7761,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": false,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "baseType",
 						"name": "interface{}"
@@ -7795,7 +7795,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": false,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "baseType",
 						"name": "interface{}"
@@ -8309,7 +8309,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": false,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "baseType",
 						"name": "interface{}"
@@ -8343,7 +8343,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": false,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "baseType",
 						"name": "interface{}"
@@ -8550,7 +8550,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": true,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "baseType",
 						"name": "string"
@@ -8686,7 +8686,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": false,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "baseType",
 						"name": "interface{}"
@@ -9115,7 +9115,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": false,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "baseType",
 						"name": "string"
@@ -9140,7 +9140,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": false,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "baseType",
 						"name": "interface{}"
@@ -9174,7 +9174,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": false,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "baseType",
 						"name": "interface{}"
@@ -9266,7 +9266,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": false,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "baseType",
 						"name": "interface{}"
@@ -9411,7 +9411,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": false,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "baseType",
 						"name": "interface{}"
@@ -9436,7 +9436,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": true,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "baseType",
 						"name": "string"
@@ -9524,7 +9524,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": false,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "baseType",
 						"name": "interface{}"
@@ -9567,7 +9567,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": false,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "baseType",
 						"name": "string"
@@ -9610,7 +9610,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": false,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "dataType",
 						"name": "FieldValue"
@@ -9671,7 +9671,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": false,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "baseType",
 						"name": "string"
@@ -9763,7 +9763,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": false,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "baseType",
 						"name": "string"
@@ -10209,7 +10209,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": false,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "baseType",
 						"name": "interface{}"
@@ -10223,7 +10223,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": false,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "baseType",
 						"name": "string"
@@ -10298,7 +10298,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": false,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "baseType",
 						"name": "interface{}"
@@ -10312,7 +10312,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": false,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "baseType",
 						"name": "string"
@@ -10442,7 +10442,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": false,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "dataType",
 						"name": "ScoreMember"
@@ -10482,7 +10482,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": false,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "dataType",
 						"name": "ScoreMember"
@@ -10522,7 +10522,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": false,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "dataType",
 						"name": "ScoreMember"
@@ -10562,7 +10562,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": false,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "dataType",
 						"name": "ScoreMember"
@@ -10608,7 +10608,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": false,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "dataType",
 						"name": "ScoreMember"
@@ -10747,7 +10747,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": false,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "baseType",
 						"name": "interface{}"
@@ -10761,7 +10761,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": true,
-					"cmd": "",
+					"variadic": true,
 					"node": {
 						"_type": "baseType",
 						"name": "int64"
@@ -11098,7 +11098,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": false,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "baseType",
 						"name": "interface{}"
@@ -11526,7 +11526,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": false,
-					"cmd": "",
+					"variadic": false,
 					"node": {
 						"_type": "baseType",
 						"name": "interface{}"
@@ -11540,7 +11540,7 @@
 				"type": {
 					"_type": "sliceType",
 					"allowNil": true,
-					"cmd": "",
+					"variadic": true,
 					"node": {
 						"_type": "baseType",
 						"name": "int64"

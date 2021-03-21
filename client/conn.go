@@ -1,18 +1,6 @@
-/*
-Copyright 2019 Stefan Miller
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
+// SPDX-FileCopyrightText: 2019-2021 Stefan Miller
+//
+// SPDX-License-Identifier: Apache-2.0
 
 package client
 
@@ -71,8 +59,8 @@ var (
 type conn struct {
 	inShutdown int32 // atomic access
 
-	mu      sync.RWMutex
-	flushMu sync.Mutex // protect flusch method
+	mu       sync.RWMutex
+	encodemu sync.Mutex // protects encoding + flush
 
 	db *db // connection owned by db - nil otherwise
 
@@ -439,8 +427,8 @@ func (c *conn) reader(wg *sync.WaitGroup, readChan chan<- interface{}, errorChan
 }
 
 func (c *conn) flush(pipeline bool, results []*result) error {
-	c.flushMu.Lock()
-	defer c.flushMu.Unlock()
+	c.encodemu.Lock()
+	defer c.encodemu.Unlock()
 	for _, r := range results {
 		if pipeline {
 			r.flush()

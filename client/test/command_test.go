@@ -1,18 +1,6 @@
-/*
-Copyright 2019 Stefan Miller
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
+// SPDX-FileCopyrightText: 2019-2021 Stefan Miller
+//
+// SPDX-License-Identifier: Apache-2.0
 
 package client_test
 
@@ -595,13 +583,15 @@ func testClientKill(conn client.Conn, ctx *testCTX, t *testing.T) {
 		defer close(done)
 		conn, err := client.Dial("")
 		if err != nil {
-			t.Fatal(err)
+			t.Error(err)
+			return
 		}
 		defer conn.Close()
 		// send id
 		id, err := conn.ClientId().ToInt64()
 		if err != nil {
-			t.Fatal(err)
+			t.Error(err)
+			return
 		}
 		idCh <- id
 		// blocking operation.
@@ -702,19 +692,22 @@ func testClientUnblock(conn client.Conn, ctx *testCTX, t *testing.T) {
 		defer close(done)
 		conn, err := client.Dial("")
 		if err != nil {
-			t.Fatal(err)
+			t.Error(err)
+			return
 		}
 		defer conn.Close()
 		// send id
 		id, err := conn.ClientId().ToInt64()
 		if err != nil {
-			t.Fatal(err)
+			t.Error(err)
+			return
 		}
 		idCh <- id
 		// blocking operation.
 		err = conn.Brpop([]interface{}{myKey}, 0).Err()
 		if err != nil {
-			t.Fatal(err)
+			t.Error(err)
+			return
 		}
 	}()
 
@@ -965,29 +958,29 @@ func testBitcount(conn client.Conn, ctx *testCTX, t *testing.T) {
 
 func testBitfield(conn client.Conn, ctx *testCTX, t *testing.T) {
 	myKey := ctx.newKey("myKey")
-	r, err := conn.Bitfield(myKey, []interface{}{client.TypeOffsetIncrement{"i5", 100, 1}, client.TypeOffset{"u4", 0}}).ToInt64Slice()
+	r, err := conn.Bitfield(myKey, []interface{}{client.TypeOffsetIncrement{Type: "i5", Offset: 100, Increment: 1}, client.TypeOffset{Type: "u4", Offset: 0}}).ToInt64Slice()
 	assertNil(t, err)
 	assertEqual(t, len(r), 2)
 	assertEqual(t, r[0], 1)
 	assertEqual(t, r[1], 0)
 
 	myKey = ctx.newKey("myKey")
-	r, err = conn.Bitfield(myKey, []interface{}{client.TypeOffsetIncrement{"u2", 100, 1}, client.OverflowSat, client.TypeOffsetIncrement{"u2", 102, 1}}).ToInt64Slice()
+	r, err = conn.Bitfield(myKey, []interface{}{client.TypeOffsetIncrement{Type: "u2", Offset: 100, Increment: 1}, client.OverflowSat, client.TypeOffsetIncrement{Type: "u2", Offset: 102, Increment: 1}}).ToInt64Slice()
 	assertNil(t, err)
 	assertEqual(t, len(r), 2)
 	assertEqual(t, r[0], 1)
 	assertEqual(t, r[1], 1)
-	r, err = conn.Bitfield(myKey, []interface{}{client.TypeOffsetIncrement{"u2", 100, 1}, client.OverflowSat, client.TypeOffsetIncrement{"u2", 102, 1}}).ToInt64Slice()
+	r, err = conn.Bitfield(myKey, []interface{}{client.TypeOffsetIncrement{Type: "u2", Offset: 100, Increment: 1}, client.OverflowSat, client.TypeOffsetIncrement{Type: "u2", Offset: 102, Increment: 1}}).ToInt64Slice()
 	assertNil(t, err)
 	assertEqual(t, len(r), 2)
 	assertEqual(t, r[0], 2)
 	assertEqual(t, r[1], 2)
-	r, err = conn.Bitfield(myKey, []interface{}{client.TypeOffsetIncrement{"u2", 100, 1}, client.OverflowSat, client.TypeOffsetIncrement{"u2", 102, 1}}).ToInt64Slice()
+	r, err = conn.Bitfield(myKey, []interface{}{client.TypeOffsetIncrement{Type: "u2", Offset: 100, Increment: 1}, client.OverflowSat, client.TypeOffsetIncrement{Type: "u2", Offset: 102, Increment: 1}}).ToInt64Slice()
 	assertNil(t, err)
 	assertEqual(t, len(r), 2)
 	assertEqual(t, r[0], 3)
 	assertEqual(t, r[1], 3)
-	r, err = conn.Bitfield(myKey, []interface{}{client.TypeOffsetIncrement{"u2", 100, 1}, client.OverflowSat, client.TypeOffsetIncrement{"u2", 102, 1}}).ToInt64Slice()
+	r, err = conn.Bitfield(myKey, []interface{}{client.TypeOffsetIncrement{Type: "u2", Offset: 100, Increment: 1}, client.OverflowSat, client.TypeOffsetIncrement{Type: "u2", Offset: 102, Increment: 1}}).ToInt64Slice()
 	assertNil(t, err)
 	assertEqual(t, len(r), 2)
 	assertEqual(t, r[0], 0)
@@ -1231,7 +1224,7 @@ func testMget(conn client.Conn, ctx *testCTX, t *testing.T) {
 
 func testMset(conn client.Conn, ctx *testCTX, t *testing.T) {
 	key1, key2 := ctx.newKey("key1"), ctx.newKey("key2")
-	ok, err := conn.Mset([]client.KeyValue{{key1, "Hello"}, {key2, "World"}}).ToBool()
+	ok, err := conn.Mset([]client.KeyValue{{Key: key1, Value: "Hello"}, {Key: key2, Value: "World"}}).ToBool()
 	assertNil(t, err)
 	assertEqual(t, ok, true)
 	s, err := conn.Get(key1).ToString()
@@ -1244,10 +1237,10 @@ func testMset(conn client.Conn, ctx *testCTX, t *testing.T) {
 
 func testMsetNx(conn client.Conn, ctx *testCTX, t *testing.T) {
 	key1, key2, key3 := ctx.newKey("key1"), ctx.newKey("key2"), ctx.newKey("key3")
-	i, err := conn.MsetNx([]client.KeyValue{{key1, "Hello"}, {key2, "there"}}).ToInt64()
+	i, err := conn.MsetNx([]client.KeyValue{{Key: key1, Value: "Hello"}, {Key: key2, Value: "there"}}).ToInt64()
 	assertNil(t, err)
 	assertEqual(t, i, 1)
-	i, err = conn.MsetNx([]client.KeyValue{{key2, "new"}, {key3, "World"}}).ToInt64()
+	i, err = conn.MsetNx([]client.KeyValue{{Key: key2, Value: "new"}, {Key: key3, Value: "World"}}).ToInt64()
 	assertNil(t, err)
 	assertEqual(t, i, 0)
 	slice, err := conn.Mget([]interface{}{key1, key2, key3}).ToIntfSlice()
@@ -1616,7 +1609,7 @@ func testExpireat(conn client.Conn, ctx *testCTX, t *testing.T) {
 
 func testKeys(conn client.Conn, ctx *testCTX, t *testing.T) {
 	firstname, lastname, age := ctx.newKey("firstname"), ctx.newKey("lastname"), ctx.newKey("age")
-	ok, err := conn.Mset([]client.KeyValue{{firstname, "Jack"}, {lastname, "Stuntman"}, {age, 35}}).ToBool()
+	ok, err := conn.Mset([]client.KeyValue{{Key: firstname, Value: "Jack"}, {Key: lastname, Value: "Stuntman"}, {Key: age, Value: 35}}).ToBool()
 	assertNil(t, err)
 	assertEqual(t, ok, true)
 	slice, err := conn.Keys("*name*").ToStringSlice()
@@ -2134,7 +2127,7 @@ func testRpushx(conn client.Conn, ctx *testCTX, t *testing.T) {
 // Hashes
 func testHdel(conn client.Conn, ctx *testCTX, t *testing.T) {
 	key := ctx.newKey("myHash")
-	assertNil(t, conn.Hset(key, []client.FieldValue{{"field1", "foo"}}).Err())
+	assertNil(t, conn.Hset(key, []client.FieldValue{{Field: "field1", Value: "foo"}}).Err())
 	i, err := conn.Hdel(key, []interface{}{"field1"}).ToInt64()
 	assertNil(t, err)
 	assertEqual(t, i, 1)
@@ -2145,7 +2138,7 @@ func testHdel(conn client.Conn, ctx *testCTX, t *testing.T) {
 
 func testHexists(conn client.Conn, ctx *testCTX, t *testing.T) {
 	key := ctx.newKey("myHash")
-	assertNil(t, conn.Hset(key, []client.FieldValue{{"field1", "foo"}}).Err())
+	assertNil(t, conn.Hset(key, []client.FieldValue{{Field: "field1", Value: "foo"}}).Err())
 	i, err := conn.Hexists(key, "field1").ToInt64()
 	assertNil(t, err)
 	assertEqual(t, i, 1)
@@ -2156,7 +2149,7 @@ func testHexists(conn client.Conn, ctx *testCTX, t *testing.T) {
 
 func testHget(conn client.Conn, ctx *testCTX, t *testing.T) {
 	key := ctx.newKey("myHash")
-	assertNil(t, conn.Hset(key, []client.FieldValue{{"field1", "foo"}}).Err())
+	assertNil(t, conn.Hset(key, []client.FieldValue{{Field: "field1", Value: "foo"}}).Err())
 	s, err := conn.Hget(key, "field1").ToString()
 	assertNil(t, err)
 	assertEqual(t, s, "foo")
@@ -2167,7 +2160,7 @@ func testHget(conn client.Conn, ctx *testCTX, t *testing.T) {
 
 func testHgetall(conn client.Conn, ctx *testCTX, t *testing.T) {
 	key := ctx.newKey("myHash")
-	assertNil(t, conn.Hset(key, []client.FieldValue{{"field1", "Hello"}, {"field2", "World"}}).Err())
+	assertNil(t, conn.Hset(key, []client.FieldValue{{Field: "field1", Value: "Hello"}, {Field: "field2", Value: "World"}}).Err())
 	m, err := conn.Hgetall(key).ToStringStringMap()
 	assertNil(t, err)
 	assertEqual(t, m, map[string]string{"field1": "Hello", "field2": "World"})
@@ -2175,7 +2168,7 @@ func testHgetall(conn client.Conn, ctx *testCTX, t *testing.T) {
 
 func testHincrby(conn client.Conn, ctx *testCTX, t *testing.T) {
 	key := ctx.newKey("myHash")
-	i, err := conn.Hset(key, []client.FieldValue{{"field", 5}}).ToInt64()
+	i, err := conn.Hset(key, []client.FieldValue{{Field: "field", Value: 5}}).ToInt64()
 	assertNil(t, err)
 	assertEqual(t, i, 1)
 	i, err = conn.Hincrby(key, "field", 1).ToInt64()
@@ -2191,7 +2184,7 @@ func testHincrby(conn client.Conn, ctx *testCTX, t *testing.T) {
 
 func testHincrbyfloat(conn client.Conn, ctx *testCTX, t *testing.T) {
 	key := ctx.newKey("myHash")
-	i, err := conn.Hset(key, []client.FieldValue{{"field", 10.50}}).ToInt64()
+	i, err := conn.Hset(key, []client.FieldValue{{Field: "field", Value: 10.50}}).ToInt64()
 	assertNil(t, err)
 	assertEqual(t, i, 1)
 	f, err := conn.Hincrbyfloat(key, "field", 0.1).ToFloat64()
@@ -2200,7 +2193,7 @@ func testHincrbyfloat(conn client.Conn, ctx *testCTX, t *testing.T) {
 	f, err = conn.Hincrbyfloat(key, "field", -5).ToFloat64()
 	assertNil(t, err)
 	assertEqual(t, f, 5.6)
-	i, err = conn.Hset(key, []client.FieldValue{{"field", "5.0e3"}}).ToInt64()
+	i, err = conn.Hset(key, []client.FieldValue{{Field: "field", Value: "5.0e3"}}).ToInt64()
 	assertNil(t, err)
 	assertEqual(t, i, 0)
 	f, err = conn.Hincrbyfloat(key, "field", 2.0e2).ToFloat64()
@@ -2210,7 +2203,7 @@ func testHincrbyfloat(conn client.Conn, ctx *testCTX, t *testing.T) {
 
 func testHkeys(conn client.Conn, ctx *testCTX, t *testing.T) {
 	key := ctx.newKey("myHash")
-	assertNil(t, conn.Hset(key, []client.FieldValue{{"field1", "Hello"}, {"field2", "World"}}).Err())
+	assertNil(t, conn.Hset(key, []client.FieldValue{{Field: "field1", Value: "Hello"}, {Field: "field2", Value: "World"}}).Err())
 	slice, err := conn.Hkeys(key).ToStringSlice()
 	assertNil(t, err)
 	assertEqual(t, slice, []string{"field1", "field2"})
@@ -2218,7 +2211,7 @@ func testHkeys(conn client.Conn, ctx *testCTX, t *testing.T) {
 
 func testHlen(conn client.Conn, ctx *testCTX, t *testing.T) {
 	key := ctx.newKey("myHash")
-	assertNil(t, conn.Hset(key, []client.FieldValue{{"field1", "Hello"}, {"field2", "World"}}).Err())
+	assertNil(t, conn.Hset(key, []client.FieldValue{{Field: "field1", Value: "Hello"}, {Field: "field2", Value: "World"}}).Err())
 	i, err := conn.Hlen(key).ToInt64()
 	assertNil(t, err)
 	assertEqual(t, i, 2)
@@ -2226,7 +2219,7 @@ func testHlen(conn client.Conn, ctx *testCTX, t *testing.T) {
 
 func testHmget(conn client.Conn, ctx *testCTX, t *testing.T) {
 	key := ctx.newKey("myHash")
-	assertNil(t, conn.Hset(key, []client.FieldValue{{"field1", "Hello"}, {"field2", "World"}}).Err())
+	assertNil(t, conn.Hset(key, []client.FieldValue{{Field: "field1", Value: "Hello"}, {Field: "field2", Value: "World"}}).Err())
 	a2, err := conn.Hmget(key, []interface{}{"field1", "field2", "nofield"}).ToIntfSlice()
 	assertNil(t, err)
 	assertEqual(t, a2, []interface{}{"Hello", "World", nil})
@@ -2234,7 +2227,7 @@ func testHmget(conn client.Conn, ctx *testCTX, t *testing.T) {
 
 func testHset(conn client.Conn, ctx *testCTX, t *testing.T) {
 	key := ctx.newKey("myHash")
-	assertNil(t, conn.Hset(key, []client.FieldValue{{"field1", "Hello"}}).Err())
+	assertNil(t, conn.Hset(key, []client.FieldValue{{Field: "field1", Value: "Hello"}}).Err())
 	s, err := conn.Hget(key, "field1").ToString()
 	assertNil(t, err)
 	assertEqual(t, s, "Hello")
@@ -2255,7 +2248,7 @@ func testHsetNx(conn client.Conn, ctx *testCTX, t *testing.T) {
 
 func testHstrlen(conn client.Conn, ctx *testCTX, t *testing.T) {
 	key := ctx.newKey("myHash")
-	i, err := conn.Hset(key, []client.FieldValue{{"f1", "HelloWorld"}, {"f2", 99}, {"f3", -256}}).ToInt64()
+	i, err := conn.Hset(key, []client.FieldValue{{Field: "f1", Value: "HelloWorld"}, {Field: "f2", Value: 99}, {Field: "f3", Value: -256}}).ToInt64()
 	assertNil(t, err)
 	assertEqual(t, i, 3)
 	i, err = conn.Hstrlen(key, "f1").ToInt64()
@@ -2271,7 +2264,7 @@ func testHstrlen(conn client.Conn, ctx *testCTX, t *testing.T) {
 
 func testHvals(conn client.Conn, ctx *testCTX, t *testing.T) {
 	key := ctx.newKey("myHash")
-	assertNil(t, conn.Hset(key, []client.FieldValue{{"field1", "Hello"}, {"field2", "World"}}).Err())
+	assertNil(t, conn.Hset(key, []client.FieldValue{{Field: "field1", Value: "Hello"}, {Field: "field2", Value: "World"}}).Err())
 	slice, err := conn.Hvals(key).ToStringSlice()
 	assertNil(t, err)
 	assertEqual(t, slice, []string{"Hello", "World"})
@@ -2279,7 +2272,7 @@ func testHvals(conn client.Conn, ctx *testCTX, t *testing.T) {
 
 func testHscan(conn client.Conn, ctx *testCTX, t *testing.T) {
 	key := ctx.newKey("myHash")
-	i, err := conn.Hset(key, []client.FieldValue{{"field1", "Hello"}, {"field2", "World"}}).ToInt64()
+	i, err := conn.Hset(key, []client.FieldValue{{Field: "field1", Value: "Hello"}, {Field: "field2", Value: "World"}}).ToInt64()
 	assertNil(t, err)
 	assertEqual(t, i, 2)
 	slice, err := conn.Hscan(key, 0, nil, nil).ToSlice()
@@ -2572,7 +2565,7 @@ func testSscan(conn client.Conn, ctx *testCTX, t *testing.T) {
 // Sorted Sets
 func testBzpopmax(conn client.Conn, ctx *testCTX, t *testing.T) {
 	key1, key2 := ctx.newKey("myZset1"), ctx.newKey("myZset2")
-	i, err := conn.Zadd(key1, []client.ScoreMember{{0, "a"}, {1, "b"}, {2, "c"}}).ToInt64()
+	i, err := conn.Zadd(key1, []client.ScoreMember{{Score: 0, Member: "a"}, {Score: 1, Member: "b"}, {Score: 2, Member: "c"}}).ToInt64()
 	assertNil(t, err)
 	assertEqual(t, i, 3)
 	slice, err := conn.Bzpopmax([]interface{}{key1, key2}, 0).ToIntfSlice()
@@ -2582,7 +2575,7 @@ func testBzpopmax(conn client.Conn, ctx *testCTX, t *testing.T) {
 
 func testBzpopmin(conn client.Conn, ctx *testCTX, t *testing.T) {
 	key1, key2 := ctx.newKey("myZset1"), ctx.newKey("myZset2")
-	i, err := conn.Zadd(key1, []client.ScoreMember{{0, "a"}, {1, "b"}, {2, "c"}}).ToInt64()
+	i, err := conn.Zadd(key1, []client.ScoreMember{{Score: 0, Member: "a"}, {Score: 1, Member: "b"}, {Score: 2, Member: "c"}}).ToInt64()
 	assertNil(t, err)
 	assertEqual(t, i, 3)
 	slice, err := conn.Bzpopmin([]interface{}{key1, key2}, 0).ToIntfSlice()
@@ -2596,13 +2589,13 @@ func testZadd(conn client.Conn, ctx *testCTX, t *testing.T) {
 	// Zadd
 	err := conn.Del([]interface{}{key}).Err()
 	assertNil(t, err)
-	i, err := conn.Zadd(key, []client.ScoreMember{{1, "one"}}).ToInt64()
+	i, err := conn.Zadd(key, []client.ScoreMember{{Score: 1, Member: "one"}}).ToInt64()
 	assertNil(t, err)
 	assertEqual(t, i, 1)
-	i, err = conn.Zadd(key, []client.ScoreMember{{1, "uno"}}).ToInt64()
+	i, err = conn.Zadd(key, []client.ScoreMember{{Score: 1, Member: "uno"}}).ToInt64()
 	assertNil(t, err)
 	assertEqual(t, i, 1)
-	i, err = conn.Zadd(key, []client.ScoreMember{{2, "two"}, {3, "three"}}).ToInt64()
+	i, err = conn.Zadd(key, []client.ScoreMember{{Score: 2, Member: "two"}, {Score: 3, Member: "three"}}).ToInt64()
 	assertNil(t, err)
 	assertEqual(t, i, 2)
 	slice, err := conn.Zrange(key, 0, -1, true).ToIntfSlice2()
@@ -2612,20 +2605,20 @@ func testZadd(conn client.Conn, ctx *testCTX, t *testing.T) {
 	// ZaddCh
 	err = conn.Del([]interface{}{key}).Err()
 	assertNil(t, err)
-	i, err = conn.Zadd(key, []client.ScoreMember{{1, "one"}, {2, "two"}}).ToInt64()
+	i, err = conn.Zadd(key, []client.ScoreMember{{Score: 1, Member: "one"}, {Score: 2, Member: "two"}}).ToInt64()
 	assertNil(t, err)
 	assertEqual(t, i, 2)
-	i, err = conn.ZaddCh(key, []client.ScoreMember{{2.2, "two"}, {3, "three"}}).ToInt64()
+	i, err = conn.ZaddCh(key, []client.ScoreMember{{Score: 2.2, Member: "two"}, {Score: 3, Member: "three"}}).ToInt64()
 	assertNil(t, err)
 	assertEqual(t, i, 2)
 
 	// ZaddNx
 	err = conn.Del([]interface{}{key}).Err()
 	assertNil(t, err)
-	i, err = conn.Zadd(key, []client.ScoreMember{{1, "one"}, {2, "two"}}).ToInt64()
+	i, err = conn.Zadd(key, []client.ScoreMember{{Score: 1, Member: "one"}, {Score: 2, Member: "two"}}).ToInt64()
 	assertNil(t, err)
 	assertEqual(t, i, 2)
-	i, err = conn.ZaddNx(key, []client.ScoreMember{{1.1, "one"}, {3, "three"}}).ToInt64()
+	i, err = conn.ZaddNx(key, []client.ScoreMember{{Score: 1.1, Member: "one"}, {Score: 3, Member: "three"}}).ToInt64()
 	assertNil(t, err)
 	assertEqual(t, i, 1)
 	slice, err = conn.Zrange(key, 0, -1, true).ToIntfSlice2()
@@ -2635,10 +2628,10 @@ func testZadd(conn client.Conn, ctx *testCTX, t *testing.T) {
 	// ZaddXx
 	err = conn.Del([]interface{}{key}).Err()
 	assertNil(t, err)
-	i, err = conn.Zadd(key, []client.ScoreMember{{1, "one"}, {2, "two"}}).ToInt64()
+	i, err = conn.Zadd(key, []client.ScoreMember{{Score: 1, Member: "one"}, {Score: 2, Member: "two"}}).ToInt64()
 	assertNil(t, err)
 	assertEqual(t, i, 2)
-	i, err = conn.ZaddXx(key, []client.ScoreMember{{1.1, "one"}, {3, "three"}}).ToInt64()
+	i, err = conn.ZaddXx(key, []client.ScoreMember{{Score: 1.1, Member: "one"}, {Score: 3, Member: "three"}}).ToInt64()
 	assertNil(t, err)
 	assertEqual(t, i, 0)
 	slice, err = conn.Zrange(key, 0, -1, true).ToIntfSlice2()
@@ -2648,10 +2641,10 @@ func testZadd(conn client.Conn, ctx *testCTX, t *testing.T) {
 	// ZaddXxCh
 	err = conn.Del([]interface{}{key}).Err()
 	assertNil(t, err)
-	i, err = conn.Zadd(key, []client.ScoreMember{{1, "one"}, {2, "two"}}).ToInt64()
+	i, err = conn.Zadd(key, []client.ScoreMember{{Score: 1, Member: "one"}, {Score: 2, Member: "two"}}).ToInt64()
 	assertNil(t, err)
 	assertEqual(t, i, 2)
-	i, err = conn.ZaddXxCh(key, []client.ScoreMember{{1.1, "one"}, {3, "three"}}).ToInt64()
+	i, err = conn.ZaddXxCh(key, []client.ScoreMember{{Score: 1.1, Member: "one"}, {Score: 3, Member: "three"}}).ToInt64()
 	assertNil(t, err)
 	assertEqual(t, i, 1)
 	slice, err = conn.Zrange(key, 0, -1, true).ToIntfSlice2()
@@ -2661,7 +2654,7 @@ func testZadd(conn client.Conn, ctx *testCTX, t *testing.T) {
 
 func testZcard(conn client.Conn, ctx *testCTX, t *testing.T) {
 	key := ctx.newKey("myZset")
-	i, err := conn.Zadd(key, []client.ScoreMember{{1, "one"}, {2, "two"}}).ToInt64()
+	i, err := conn.Zadd(key, []client.ScoreMember{{Score: 1, Member: "one"}, {Score: 2, Member: "two"}}).ToInt64()
 	assertNil(t, err)
 	assertEqual(t, i, 2)
 	i, err = conn.Zcard(key).ToInt64()
@@ -2671,7 +2664,7 @@ func testZcard(conn client.Conn, ctx *testCTX, t *testing.T) {
 
 func testZcount(conn client.Conn, ctx *testCTX, t *testing.T) {
 	key := ctx.newKey("myZset")
-	i, err := conn.Zadd(key, []client.ScoreMember{{1, "one"}, {2, "two"}, {3, "three"}}).ToInt64()
+	i, err := conn.Zadd(key, []client.ScoreMember{{Score: 1, Member: "one"}, {Score: 2, Member: "two"}, {Score: 3, Member: "three"}}).ToInt64()
 	assertNil(t, err)
 	assertEqual(t, i, 3)
 	i, err = conn.Zcount(key, client.InfNeg, client.InfPos).ToInt64()
@@ -2684,7 +2677,7 @@ func testZcount(conn client.Conn, ctx *testCTX, t *testing.T) {
 
 func testZincrby(conn client.Conn, ctx *testCTX, t *testing.T) {
 	key := ctx.newKey("myZset")
-	i, err := conn.Zadd(key, []client.ScoreMember{{1, "one"}, {2, "two"}}).ToInt64()
+	i, err := conn.Zadd(key, []client.ScoreMember{{Score: 1, Member: "one"}, {Score: 2, Member: "two"}}).ToInt64()
 	assertNil(t, err)
 	assertEqual(t, i, 2)
 	f, err := conn.Zincrby(key, 2, "one").ToFloat64()
@@ -2697,10 +2690,10 @@ func testZincrby(conn client.Conn, ctx *testCTX, t *testing.T) {
 
 func testZinterstore(conn client.Conn, ctx *testCTX, t *testing.T) {
 	key1, key2 := ctx.newKey("zset1"), ctx.newKey("zset2")
-	i, err := conn.Zadd(key1, []client.ScoreMember{{1, "one"}, {2, "two"}}).ToInt64()
+	i, err := conn.Zadd(key1, []client.ScoreMember{{Score: 1, Member: "one"}, {Score: 2, Member: "two"}}).ToInt64()
 	assertNil(t, err)
 	assertEqual(t, i, 2)
-	i, err = conn.Zadd(key2, []client.ScoreMember{{1, "one"}, {2, "two"}, {3, "three"}}).ToInt64()
+	i, err = conn.Zadd(key2, []client.ScoreMember{{Score: 1, Member: "one"}, {Score: 2, Member: "two"}, {Score: 3, Member: "three"}}).ToInt64()
 	assertNil(t, err)
 	assertEqual(t, i, 3)
 	key := ctx.newKey("out")
@@ -2714,10 +2707,10 @@ func testZinterstore(conn client.Conn, ctx *testCTX, t *testing.T) {
 
 func testZlexcount(conn client.Conn, ctx *testCTX, t *testing.T) {
 	key := ctx.newKey("myZset")
-	i, err := conn.Zadd(key, []client.ScoreMember{{0, "a"}, {0, "b"}, {0, "c"}, {0, "d"}, {0, "e"}}).ToInt64()
+	i, err := conn.Zadd(key, []client.ScoreMember{{Score: 0, Member: "a"}, {Score: 0, Member: "b"}, {Score: 0, Member: "c"}, {Score: 0, Member: "d"}, {Score: 0, Member: "e"}}).ToInt64()
 	assertNil(t, err)
 	assertEqual(t, i, 5)
-	i, err = conn.Zadd(key, []client.ScoreMember{{0, "f"}, {0, "g"}}).ToInt64()
+	i, err = conn.Zadd(key, []client.ScoreMember{{Score: 0, Member: "f"}, {Score: 0, Member: "g"}}).ToInt64()
 	assertNil(t, err)
 	assertEqual(t, i, 2)
 	i, err = conn.Zlexcount(key, "-", "+").ToInt64()
@@ -2730,7 +2723,7 @@ func testZlexcount(conn client.Conn, ctx *testCTX, t *testing.T) {
 
 func testZpopmax(conn client.Conn, ctx *testCTX, t *testing.T) {
 	key := ctx.newKey("myZset")
-	i, err := conn.Zadd(key, []client.ScoreMember{{1, "one"}, {2, "two"}, {3, "three"}}).ToInt64()
+	i, err := conn.Zadd(key, []client.ScoreMember{{Score: 1, Member: "one"}, {Score: 2, Member: "two"}, {Score: 3, Member: "three"}}).ToInt64()
 	assertNil(t, err)
 	assertEqual(t, i, 3)
 	slice, err := conn.Zpopmax(key, nil).ToIntfSlice()
@@ -2740,7 +2733,7 @@ func testZpopmax(conn client.Conn, ctx *testCTX, t *testing.T) {
 
 func testZpopmin(conn client.Conn, ctx *testCTX, t *testing.T) {
 	key := ctx.newKey("myZset")
-	i, err := conn.Zadd(key, []client.ScoreMember{{1, "one"}, {2, "two"}, {3, "three"}}).ToInt64()
+	i, err := conn.Zadd(key, []client.ScoreMember{{Score: 1, Member: "one"}, {Score: 2, Member: "two"}, {Score: 3, Member: "three"}}).ToInt64()
 	assertNil(t, err)
 	assertEqual(t, i, 3)
 	slice, err := conn.Zpopmin(key, nil).ToIntfSlice()
@@ -2750,7 +2743,7 @@ func testZpopmin(conn client.Conn, ctx *testCTX, t *testing.T) {
 
 func testZrange(conn client.Conn, ctx *testCTX, t *testing.T) {
 	key := ctx.newKey("myZset")
-	i, err := conn.Zadd(key, []client.ScoreMember{{1, "one"}, {2, "two"}, {3, "three"}}).ToInt64()
+	i, err := conn.Zadd(key, []client.ScoreMember{{Score: 1, Member: "one"}, {Score: 2, Member: "two"}, {Score: 3, Member: "three"}}).ToInt64()
 	assertNil(t, err)
 	assertEqual(t, i, 3)
 	slice, err := conn.Zrange(key, 0, -1, false).ToStringSlice()
@@ -2769,7 +2762,7 @@ func testZrange(conn client.Conn, ctx *testCTX, t *testing.T) {
 
 func testZrangebylex(conn client.Conn, ctx *testCTX, t *testing.T) {
 	key := ctx.newKey("myZset")
-	i, err := conn.Zadd(key, []client.ScoreMember{{0, "a"}, {0, "b"}, {0, "c"}, {0, "d"}, {0, "e"}, {0, "f"}, {0, "g"}}).ToInt64()
+	i, err := conn.Zadd(key, []client.ScoreMember{{Score: 0, Member: "a"}, {Score: 0, Member: "b"}, {Score: 0, Member: "c"}, {Score: 0, Member: "d"}, {Score: 0, Member: "e"}, {Score: 0, Member: "f"}, {Score: 0, Member: "g"}}).ToInt64()
 	assertNil(t, err)
 	assertEqual(t, i, 7)
 	slice, err := conn.Zrangebylex(key, "-", "[c", nil).ToStringSlice()
@@ -2785,7 +2778,7 @@ func testZrangebylex(conn client.Conn, ctx *testCTX, t *testing.T) {
 
 func testZrangebyscore(conn client.Conn, ctx *testCTX, t *testing.T) {
 	key := ctx.newKey("myZset")
-	i, err := conn.Zadd(key, []client.ScoreMember{{1, "one"}, {2, "two"}, {3, "three"}}).ToInt64()
+	i, err := conn.Zadd(key, []client.ScoreMember{{Score: 1, Member: "one"}, {Score: 2, Member: "two"}, {Score: 3, Member: "three"}}).ToInt64()
 	assertNil(t, err)
 	assertEqual(t, i, 3)
 	slice, err := conn.Zrangebyscore(key, client.InfNeg, client.InfPos, false, nil).ToStringSlice()
@@ -2804,7 +2797,7 @@ func testZrangebyscore(conn client.Conn, ctx *testCTX, t *testing.T) {
 
 func testZrank(conn client.Conn, ctx *testCTX, t *testing.T) {
 	key := ctx.newKey("myZset")
-	i, err := conn.Zadd(key, []client.ScoreMember{{1, "one"}, {2, "two"}, {3, "three"}}).ToInt64()
+	i, err := conn.Zadd(key, []client.ScoreMember{{Score: 1, Member: "one"}, {Score: 2, Member: "two"}, {Score: 3, Member: "three"}}).ToInt64()
 	assertNil(t, err)
 	assertEqual(t, i, 3)
 	i, err = conn.Zrank(key, "three").ToInt64()
@@ -2817,7 +2810,7 @@ func testZrank(conn client.Conn, ctx *testCTX, t *testing.T) {
 
 func testZrem(conn client.Conn, ctx *testCTX, t *testing.T) {
 	key := ctx.newKey("myZset")
-	i, err := conn.Zadd(key, []client.ScoreMember{{1, "one"}, {2, "two"}, {3, "three"}}).ToInt64()
+	i, err := conn.Zadd(key, []client.ScoreMember{{Score: 1, Member: "one"}, {Score: 2, Member: "two"}, {Score: 3, Member: "three"}}).ToInt64()
 	assertNil(t, err)
 	assertEqual(t, i, 3)
 	i, err = conn.Zrem(key, []interface{}{"two"}).ToInt64()
@@ -2830,10 +2823,10 @@ func testZrem(conn client.Conn, ctx *testCTX, t *testing.T) {
 
 func testZremrangebylex(conn client.Conn, ctx *testCTX, t *testing.T) {
 	key := ctx.newKey("myZset")
-	i, err := conn.Zadd(key, []client.ScoreMember{{0, "aaaa"}, {0, "b"}, {0, "c"}, {0, "d"}, {0, "e"}}).ToInt64()
+	i, err := conn.Zadd(key, []client.ScoreMember{{Score: 0, Member: "aaaa"}, {Score: 0, Member: "b"}, {Score: 0, Member: "c"}, {Score: 0, Member: "d"}, {Score: 0, Member: "e"}}).ToInt64()
 	assertNil(t, err)
 	assertEqual(t, i, 5)
-	i, err = conn.Zadd(key, []client.ScoreMember{{0, "foo"}, {0, "zap"}, {0, "zip"}, {0, "ALPHA"}, {0, "alpha"}}).ToInt64()
+	i, err = conn.Zadd(key, []client.ScoreMember{{Score: 0, Member: "foo"}, {Score: 0, Member: "zap"}, {Score: 0, Member: "zip"}, {Score: 0, Member: "ALPHA"}, {Score: 0, Member: "alpha"}}).ToInt64()
 	assertNil(t, err)
 	assertEqual(t, i, 5)
 	slice, err := conn.Zrange(key, 0, -1, false).ToStringSlice()
@@ -2849,7 +2842,7 @@ func testZremrangebylex(conn client.Conn, ctx *testCTX, t *testing.T) {
 
 func testZremrangebyrank(conn client.Conn, ctx *testCTX, t *testing.T) {
 	key := ctx.newKey("myZset")
-	i, err := conn.Zadd(key, []client.ScoreMember{{1, "one"}, {2, "two"}, {3, "three"}}).ToInt64()
+	i, err := conn.Zadd(key, []client.ScoreMember{{Score: 1, Member: "one"}, {Score: 2, Member: "two"}, {Score: 3, Member: "three"}}).ToInt64()
 	assertNil(t, err)
 	assertEqual(t, i, 3)
 	i, err = conn.Zremrangebyrank(key, 0, 1).ToInt64()
@@ -2862,7 +2855,7 @@ func testZremrangebyrank(conn client.Conn, ctx *testCTX, t *testing.T) {
 
 func testZremrangebyscore(conn client.Conn, ctx *testCTX, t *testing.T) {
 	key := ctx.newKey("myZset")
-	i, err := conn.Zadd(key, []client.ScoreMember{{1, "one"}, {2, "two"}, {3, "three"}}).ToInt64()
+	i, err := conn.Zadd(key, []client.ScoreMember{{Score: 1, Member: "one"}, {Score: 2, Member: "two"}, {Score: 3, Member: "three"}}).ToInt64()
 	assertNil(t, err)
 	assertEqual(t, i, 3)
 	i, err = conn.Zremrangebyscore(key, client.InfNeg, client.Zopen(2)).ToInt64()
@@ -2875,7 +2868,7 @@ func testZremrangebyscore(conn client.Conn, ctx *testCTX, t *testing.T) {
 
 func testZrevrange(conn client.Conn, ctx *testCTX, t *testing.T) {
 	key := ctx.newKey("myZset")
-	i, err := conn.Zadd(key, []client.ScoreMember{{1, "one"}, {2, "two"}, {3, "three"}}).ToInt64()
+	i, err := conn.Zadd(key, []client.ScoreMember{{Score: 1, Member: "one"}, {Score: 2, Member: "two"}, {Score: 3, Member: "three"}}).ToInt64()
 	assertNil(t, err)
 	assertEqual(t, i, 3)
 	slice, err := conn.Zrevrange(key, 0, -1, false).ToStringSlice()
@@ -2891,7 +2884,7 @@ func testZrevrange(conn client.Conn, ctx *testCTX, t *testing.T) {
 
 func testZrevrangebylex(conn client.Conn, ctx *testCTX, t *testing.T) {
 	key := ctx.newKey("myZset")
-	i, err := conn.Zadd(key, []client.ScoreMember{{0, "a"}, {0, "b"}, {0, "c"}, {0, "d"}, {0, "e"}, {0, "f"}, {0, "g"}}).ToInt64()
+	i, err := conn.Zadd(key, []client.ScoreMember{{Score: 0, Member: "a"}, {Score: 0, Member: "b"}, {Score: 0, Member: "c"}, {Score: 0, Member: "d"}, {Score: 0, Member: "e"}, {Score: 0, Member: "f"}, {Score: 0, Member: "g"}}).ToInt64()
 	assertNil(t, err)
 	assertEqual(t, i, 7)
 	slice, err := conn.Zrevrangebylex(key, "[c", "-", nil).ToStringSlice()
@@ -2907,7 +2900,7 @@ func testZrevrangebylex(conn client.Conn, ctx *testCTX, t *testing.T) {
 
 func testZrevrangebyscore(conn client.Conn, ctx *testCTX, t *testing.T) {
 	key := ctx.newKey("myZset")
-	i, err := conn.Zadd(key, []client.ScoreMember{{1, "one"}, {2, "two"}, {3, "three"}}).ToInt64()
+	i, err := conn.Zadd(key, []client.ScoreMember{{Score: 1, Member: "one"}, {Score: 2, Member: "two"}, {Score: 3, Member: "three"}}).ToInt64()
 	assertNil(t, err)
 	assertEqual(t, i, 3)
 	slice, err := conn.Zrevrangebyscore(key, client.InfPos, client.InfNeg, false, nil).ToStringSlice()
@@ -2926,7 +2919,7 @@ func testZrevrangebyscore(conn client.Conn, ctx *testCTX, t *testing.T) {
 
 func testZrevrank(conn client.Conn, ctx *testCTX, t *testing.T) {
 	key := ctx.newKey("myZset")
-	i, err := conn.Zadd(key, []client.ScoreMember{{1, "one"}, {2, "two"}, {3, "three"}}).ToInt64()
+	i, err := conn.Zadd(key, []client.ScoreMember{{Score: 1, Member: "one"}, {Score: 2, Member: "two"}, {Score: 3, Member: "three"}}).ToInt64()
 	assertNil(t, err)
 	assertEqual(t, i, 3)
 	i, err = conn.Zrevrank(key, "one").ToInt64()
@@ -2939,7 +2932,7 @@ func testZrevrank(conn client.Conn, ctx *testCTX, t *testing.T) {
 
 func testZscan(conn client.Conn, ctx *testCTX, t *testing.T) {
 	key := ctx.newKey("myZset")
-	i, err := conn.Zadd(key, []client.ScoreMember{{1, "one"}, {2, "two"}, {3, "three"}}).ToInt64()
+	i, err := conn.Zadd(key, []client.ScoreMember{{Score: 1, Member: "one"}, {Score: 2, Member: "two"}, {Score: 3, Member: "three"}}).ToInt64()
 	assertNil(t, err)
 	assertEqual(t, i, 3)
 	slice, err := conn.Zscan(key, 0, nil, nil).ToSlice()
@@ -2956,7 +2949,7 @@ func testZscan(conn client.Conn, ctx *testCTX, t *testing.T) {
 
 func testZscore(conn client.Conn, ctx *testCTX, t *testing.T) {
 	key := ctx.newKey("myZset")
-	i, err := conn.Zadd(key, []client.ScoreMember{{1, "one"}}).ToInt64()
+	i, err := conn.Zadd(key, []client.ScoreMember{{Score: 1, Member: "one"}}).ToInt64()
 	assertNil(t, err)
 	assertEqual(t, i, 1)
 	f, err := conn.Zscore(key, "one").ToFloat64()
@@ -2966,10 +2959,10 @@ func testZscore(conn client.Conn, ctx *testCTX, t *testing.T) {
 
 func testZunionstore(conn client.Conn, ctx *testCTX, t *testing.T) {
 	key1, key2 := ctx.newKey("zset1"), ctx.newKey("zset2")
-	i, err := conn.Zadd(key1, []client.ScoreMember{{1, "one"}, {2, "two"}}).ToInt64()
+	i, err := conn.Zadd(key1, []client.ScoreMember{{Score: 1, Member: "one"}, {Score: 2, Member: "two"}}).ToInt64()
 	assertNil(t, err)
 	assertEqual(t, i, 2)
-	i, err = conn.Zadd(key2, []client.ScoreMember{{1, "one"}, {2, "two"}, {3, "three"}}).ToInt64()
+	i, err = conn.Zadd(key2, []client.ScoreMember{{Score: 1, Member: "one"}, {Score: 2, Member: "two"}, {Score: 3, Member: "three"}}).ToInt64()
 	assertNil(t, err)
 	assertEqual(t, i, 3)
 	key := ctx.newKey("out")
@@ -2984,7 +2977,7 @@ func testZunionstore(conn client.Conn, ctx *testCTX, t *testing.T) {
 // Geo
 func testGeoadd(conn client.Conn, ctx *testCTX, t *testing.T) {
 	sicily := ctx.newKey("Sicily")
-	i, err := conn.Geoadd(sicily, []client.LongitudeLatitudeMember{{13.361389, 38.115556, "Palermo"}, {15.087269, 37.502669, "Catania"}}).ToInt64()
+	i, err := conn.Geoadd(sicily, []client.LongitudeLatitudeMember{{Longitude: 13.361389, Latitude: 38.115556, Member: "Palermo"}, {Longitude: 15.087269, Latitude: 37.502669, Member: "Catania"}}).ToInt64()
 	assertNil(t, err)
 	assertEqual(t, i, 2)
 	f, err := conn.Geodist(sicily, "Palermo", "Catania", nil).ToFloat64()
@@ -3000,7 +2993,7 @@ func testGeoadd(conn client.Conn, ctx *testCTX, t *testing.T) {
 
 func testGeodist(conn client.Conn, ctx *testCTX, t *testing.T) {
 	sicily := ctx.newKey("Sicily")
-	i, err := conn.Geoadd(sicily, []client.LongitudeLatitudeMember{{13.361389, 38.115556, "Palermo"}, {15.087269, 37.502669, "Catania"}}).ToInt64()
+	i, err := conn.Geoadd(sicily, []client.LongitudeLatitudeMember{{Longitude: 13.361389, Latitude: 38.115556, Member: "Palermo"}, {Longitude: 15.087269, Latitude: 37.502669, Member: "Catania"}}).ToInt64()
 	assertNil(t, err)
 	assertEqual(t, i, 2)
 	f, err := conn.Geodist(sicily, "Palermo", "Catania", nil).ToFloat64()
@@ -3020,7 +3013,7 @@ func testGeodist(conn client.Conn, ctx *testCTX, t *testing.T) {
 
 func testGeohash(conn client.Conn, ctx *testCTX, t *testing.T) {
 	sicily := ctx.newKey("Sicily")
-	i, err := conn.Geoadd(sicily, []client.LongitudeLatitudeMember{{13.361389, 38.115556, "Palermo"}, {15.087269, 37.502669, "Catania"}}).ToInt64()
+	i, err := conn.Geoadd(sicily, []client.LongitudeLatitudeMember{{Longitude: 13.361389, Latitude: 38.115556, Member: "Palermo"}, {Longitude: 15.087269, Latitude: 37.502669, Member: "Catania"}}).ToInt64()
 	assertNil(t, err)
 	assertEqual(t, i, 2)
 	slice, err := conn.Geohash(sicily, []interface{}{"Palermo", "Catania"}).ToStringSlice()
@@ -3030,7 +3023,7 @@ func testGeohash(conn client.Conn, ctx *testCTX, t *testing.T) {
 
 func testGeopos(conn client.Conn, ctx *testCTX, t *testing.T) {
 	sicily := ctx.newKey("Sicily")
-	i, err := conn.Geoadd(sicily, []client.LongitudeLatitudeMember{{13.361389, 38.115556, "Palermo"}, {15.087269, 37.502669, "Catania"}}).ToInt64()
+	i, err := conn.Geoadd(sicily, []client.LongitudeLatitudeMember{{Longitude: 13.361389, Latitude: 38.115556, Member: "Palermo"}, {Longitude: 15.087269, Latitude: 37.502669, Member: "Catania"}}).ToInt64()
 	assertNil(t, err)
 	assertEqual(t, i, 2)
 	slice, err := conn.Geopos(sicily, []interface{}{"Palermo", "Catania", "NonExisting"}).ToIntfSlice2()
@@ -3040,7 +3033,7 @@ func testGeopos(conn client.Conn, ctx *testCTX, t *testing.T) {
 
 func testGeoradius(conn client.Conn, ctx *testCTX, t *testing.T) {
 	sicily := ctx.newKey("Sicily")
-	i, err := conn.Geoadd(sicily, []client.LongitudeLatitudeMember{{13.361389, 38.115556, "Palermo"}, {15.087269, 37.502669, "Catania"}}).ToInt64()
+	i, err := conn.Geoadd(sicily, []client.LongitudeLatitudeMember{{Longitude: 13.361389, Latitude: 38.115556, Member: "Palermo"}, {Longitude: 15.087269, Latitude: 37.502669, Member: "Catania"}}).ToInt64()
 	assertNil(t, err)
 	assertEqual(t, i, 2)
 	slice, err := conn.Georadius(sicily, 15, 37, 200, client.UnitKm, false, true, false, nil, nil, nil, nil).ToIntfSlice2()
@@ -3062,10 +3055,10 @@ func testGeoradius(conn client.Conn, ctx *testCTX, t *testing.T) {
 
 func testGeoradiusbymember(conn client.Conn, ctx *testCTX, t *testing.T) {
 	sicily := ctx.newKey("Sicily")
-	i, err := conn.Geoadd(sicily, []client.LongitudeLatitudeMember{{13.583333, 37.316667, "Agrigento"}}).ToInt64()
+	i, err := conn.Geoadd(sicily, []client.LongitudeLatitudeMember{{Longitude: 13.583333, Latitude: 37.316667, Member: "Agrigento"}}).ToInt64()
 	assertNil(t, err)
 	assertEqual(t, i, 1)
-	i, err = conn.Geoadd(sicily, []client.LongitudeLatitudeMember{{13.361389, 38.115556, "Palermo"}, {15.087269, 37.502669, "Catania"}}).ToInt64()
+	i, err = conn.Geoadd(sicily, []client.LongitudeLatitudeMember{{Longitude: 13.361389, Latitude: 38.115556, Member: "Palermo"}, {Longitude: 15.087269, Latitude: 37.502669, Member: "Catania"}}).ToInt64()
 	assertNil(t, err)
 	assertEqual(t, i, 2)
 	slice, err := conn.Georadiusbymember(sicily, "Agrigento", 100, client.UnitKm, false, false, false, nil, nil, nil, nil).ToStringSlice()
@@ -3157,9 +3150,9 @@ func testScriptLoad(conn client.Conn, ctx *testCTX, t *testing.T) {
 // Streams
 func testXadd(conn client.Conn, ctx *testCTX, t *testing.T) {
 	myStream := ctx.newKey("myStream")
-	id1, err := conn.Xadd(myStream, "*", []client.FieldValue{{"name", "Sara"}, {"surname", "OConnor"}}).ToString()
+	id1, err := conn.Xadd(myStream, "*", []client.FieldValue{{Field: "name", Value: "Sara"}, {Field: "surname", Value: "OConnor"}}).ToString()
 	assertNil(t, err)
-	id2, err := conn.Xadd(myStream, "*", []client.FieldValue{{"field1", "value1"}, {"field2", "value2"}, {"field3", "value3"}}).ToString()
+	id2, err := conn.Xadd(myStream, "*", []client.FieldValue{{Field: "field1", Value: "value1"}, {Field: "field2", Value: "value2"}, {Field: "field3", Value: "value3"}}).ToString()
 	assertNil(t, err)
 	i, err := conn.Xlen(myStream).ToInt64()
 	assertNil(t, err)
@@ -3167,25 +3160,25 @@ func testXadd(conn client.Conn, ctx *testCTX, t *testing.T) {
 	slice, err := conn.Xrange(myStream, "-", "+", nil).ToXrange()
 	assertNil(t, err)
 	assertEqual(t, slice, []client.XItem{
-		{id1, []string{"name", "Sara", "surname", "OConnor"}},
-		{id2, []string{"field1", "value1", "field2", "value2", "field3", "value3"}},
+		{ID: id1, Items: []string{"name", "Sara", "surname", "OConnor"}},
+		{ID: id2, Items: []string{"field1", "value1", "field2", "value2", "field3", "value3"}},
 	})
 }
 
 func testXdel(conn client.Conn, ctx *testCTX, t *testing.T) {
 	myStream := ctx.newKey("myStream")
-	id1, err := conn.Xadd(myStream, "*", []client.FieldValue{{"a", "1"}}).ToString()
+	id1, err := conn.Xadd(myStream, "*", []client.FieldValue{{Field: "a", Value: "1"}}).ToString()
 	assertNil(t, err)
-	id2, err := conn.Xadd(myStream, "*", []client.FieldValue{{"b", "2"}}).ToString()
+	id2, err := conn.Xadd(myStream, "*", []client.FieldValue{{Field: "b", Value: "2"}}).ToString()
 	assertNil(t, err)
-	id3, err := conn.Xadd(myStream, "*", []client.FieldValue{{"c", "3"}}).ToString()
+	id3, err := conn.Xadd(myStream, "*", []client.FieldValue{{Field: "c", Value: "3"}}).ToString()
 	assertNil(t, err)
 	i, err := conn.Xdel(myStream, []string{id2}).ToInt64()
 	assertNil(t, err)
 	assertEqual(t, i, 1)
 	slice, err := conn.Xrange(myStream, "-", "+", nil).ToXrange()
 	assertNil(t, err)
-	assertEqual(t, slice, []client.XItem{{id1, []string{"a", "1"}}, {id3, []string{"c", "3"}}})
+	assertEqual(t, slice, []client.XItem{{ID: id1, Items: []string{"a", "1"}}, {ID: id3, Items: []string{"c", "3"}}})
 }
 
 func testXgroupCreate(conn client.Conn, ctx *testCTX, t *testing.T) {
@@ -3197,16 +3190,16 @@ func testXgroupCreate(conn client.Conn, ctx *testCTX, t *testing.T) {
 	assertNil(t, err)
 	assertTrue(t, ok)
 
-	id1, err := conn.Xadd(myStream, "*", []client.FieldValue{{"a", "1"}}).ToString()
+	id1, err := conn.Xadd(myStream, "*", []client.FieldValue{{Field: "a", Value: "1"}}).ToString()
 	assertNil(t, err)
-	id2, err := conn.Xadd(myStream, "*", []client.FieldValue{{"b", "2"}}).ToString()
+	id2, err := conn.Xadd(myStream, "*", []client.FieldValue{{Field: "b", Value: "2"}}).ToString()
 	assertNil(t, err)
-	err = conn.Xadd(myStream, "*", []client.FieldValue{{"c", "3"}}).Err()
+	err = conn.Xadd(myStream, "*", []client.FieldValue{{Field: "c", Value: "3"}}).Err()
 	assertNil(t, err)
 
-	err = conn.Xreadgroup(client.GroupConsumer{myGroup, consumer1}, client.Int64Ptr(1), nil, false, []interface{}{myStream}, []string{">"}).Err()
+	err = conn.Xreadgroup(client.GroupConsumer{Group: myGroup, Consumer: consumer1}, client.Int64Ptr(1), nil, false, []interface{}{myStream}, []string{">"}).Err()
 	assertNil(t, err)
-	err = conn.Xreadgroup(client.GroupConsumer{myGroup, consumer2}, client.Int64Ptr(1), nil, false, []interface{}{myStream}, []string{">"}).Err()
+	err = conn.Xreadgroup(client.GroupConsumer{Group: myGroup, Consumer: consumer2}, client.Int64Ptr(1), nil, false, []interface{}{myStream}, []string{">"}).Err()
 	assertNil(t, err)
 
 	m, err := conn.XinfoGroups(myStream).ToStringMapSlice()
@@ -3250,20 +3243,20 @@ func testXgroupSetid(conn client.Conn, ctx *testCTX, t *testing.T) {
 	myStream := ctx.newKey("myStream")
 	myGroup := ctx.newKey("myGroup")
 	myConsumer := ctx.newKey("myConsumer")
-	id, err := conn.Xadd(myStream, "*", []client.FieldValue{{"name", "Sara"}, {"surname", "OConnor"}}).ToString()
+	id, err := conn.Xadd(myStream, "*", []client.FieldValue{{Field: "name", Value: "Sara"}, {Field: "surname", Value: "OConnor"}}).ToString()
 	assertNil(t, err)
 	ok, err := conn.XgroupCreate(myStream, myGroup, "$", true).ToBool()
 	assertNil(t, err)
 	assertTrue(t, ok)
-	m, err := conn.Xreadgroup(client.GroupConsumer{myGroup, myConsumer}, nil, nil, false, []interface{}{myStream}, []string{">"}).ToXread()
+	m, err := conn.Xreadgroup(client.GroupConsumer{Group: myGroup, Consumer: myConsumer}, nil, nil, false, []interface{}{myStream}, []string{">"}).ToXread()
 	assertNil(t, err)
 	assertEqual(t, len(m[myStream]), 0)
 	err = conn.XgroupSetid(myStream, myGroup, "0").Err()
 	assertNil(t, err)
-	m, err = conn.Xreadgroup(client.GroupConsumer{myGroup, myConsumer}, nil, nil, false, []interface{}{myStream}, []string{">"}).ToXread()
+	m, err = conn.Xreadgroup(client.GroupConsumer{Group: myGroup, Consumer: myConsumer}, nil, nil, false, []interface{}{myStream}, []string{">"}).ToXread()
 	assertNil(t, err)
 	assertEqual(t, m, map[string][]client.XItem{myStream: {
-		{id, []string{"name", "Sara", "surname", "OConnor"}},
+		{ID: id, Items: []string{"name", "Sara", "surname", "OConnor"}},
 	}})
 }
 
@@ -3285,7 +3278,7 @@ func testXgroupHelp(conn client.Conn, ctx *testCTX, t *testing.T) {
 
 func testXinfoStream(conn client.Conn, ctx *testCTX, t *testing.T) {
 	myStream := ctx.newKey("myStream")
-	err := conn.Xadd(myStream, "*", []client.FieldValue{{"a", "1"}}).Err()
+	err := conn.Xadd(myStream, "*", []client.FieldValue{{Field: "a", Value: "1"}}).Err()
 	assertNil(t, err)
 	_, err = conn.XinfoStream(myStream).ToStringMap()
 	assertNil(t, err)
@@ -3298,11 +3291,11 @@ func testXinfoHelp(conn client.Conn, ctx *testCTX, t *testing.T) {
 
 func testXlen(conn client.Conn, ctx *testCTX, t *testing.T) {
 	myStream := ctx.newKey("myStream")
-	err := conn.Xadd(myStream, "*", []client.FieldValue{{"item", "1"}}).Err()
+	err := conn.Xadd(myStream, "*", []client.FieldValue{{Field: "item", Value: "1"}}).Err()
 	assertNil(t, err)
-	err = conn.Xadd(myStream, "*", []client.FieldValue{{"item", "2"}}).Err()
+	err = conn.Xadd(myStream, "*", []client.FieldValue{{Field: "item", Value: "2"}}).Err()
 	assertNil(t, err)
-	err = conn.Xadd(myStream, "*", []client.FieldValue{{"item", "3"}}).Err()
+	err = conn.Xadd(myStream, "*", []client.FieldValue{{Field: "item", Value: "3"}}).Err()
 	assertNil(t, err)
 	i, err := conn.Xlen(myStream).ToInt64()
 	assertNil(t, err)
@@ -3311,15 +3304,15 @@ func testXlen(conn client.Conn, ctx *testCTX, t *testing.T) {
 
 func testXrange(conn client.Conn, ctx *testCTX, t *testing.T) {
 	writers := ctx.newKey("writers")
-	id1, err := conn.Xadd(writers, "*", []client.FieldValue{{"name", "Virginia"}, {"surname", "Woolf"}}).ToString()
+	id1, err := conn.Xadd(writers, "*", []client.FieldValue{{Field: "name", Value: "Virginia"}, {Field: "surname", Value: "Woolf"}}).ToString()
 	assertNil(t, err)
-	id2, err := conn.Xadd(writers, "*", []client.FieldValue{{"name", "Jane"}, {"surname", "Austen"}}).ToString()
+	id2, err := conn.Xadd(writers, "*", []client.FieldValue{{Field: "name", Value: "Jane"}, {Field: "surname", Value: "Austen"}}).ToString()
 	assertNil(t, err)
-	err = conn.Xadd(writers, "*", []client.FieldValue{{"name", "Toni"}, {"surname", "Morris"}}).Err()
+	err = conn.Xadd(writers, "*", []client.FieldValue{{Field: "name", Value: "Toni"}, {Field: "surname", Value: "Morris"}}).Err()
 	assertNil(t, err)
-	err = conn.Xadd(writers, "*", []client.FieldValue{{"name", "Agatha"}, {"surname", "Christie"}}).Err()
+	err = conn.Xadd(writers, "*", []client.FieldValue{{Field: "name", Value: "Agatha"}, {Field: "surname", Value: "Christie"}}).Err()
 	assertNil(t, err)
-	err = conn.Xadd(writers, "*", []client.FieldValue{{"name", "Ngozi"}, {"surname", "Adichie"}}).Err()
+	err = conn.Xadd(writers, "*", []client.FieldValue{{Field: "name", Value: "Ngozi"}, {Field: "surname", Value: "Adichie"}}).Err()
 	assertNil(t, err)
 	i, err := conn.Xlen(writers).ToInt64()
 	assertNil(t, err)
@@ -3327,60 +3320,60 @@ func testXrange(conn client.Conn, ctx *testCTX, t *testing.T) {
 	slice, err := conn.Xrange(writers, "-", "+", client.Int64Ptr(2)).ToXrange()
 	assertNil(t, err)
 	assertEqual(t, slice, []client.XItem{
-		{id1, []string{"name", "Virginia", "surname", "Woolf"}},
-		{id2, []string{"name", "Jane", "surname", "Austen"}},
+		{ID: id1, Items: []string{"name", "Virginia", "surname", "Woolf"}},
+		{ID: id2, Items: []string{"name", "Jane", "surname", "Austen"}},
 	})
 }
 
 func testXread(conn client.Conn, ctx *testCTX, t *testing.T) {
 	writers := ctx.newKey("writers")
-	id1, err := conn.Xadd(writers, "*", []client.FieldValue{{"name", "Virginia"}, {"surname", "Woolf"}}).ToString()
+	id1, err := conn.Xadd(writers, "*", []client.FieldValue{{Field: "name", Value: "Virginia"}, {Field: "surname", Value: "Woolf"}}).ToString()
 	assertNil(t, err)
-	id2, err := conn.Xadd(writers, "*", []client.FieldValue{{"name", "Jane"}, {"surname", "Austen"}}).ToString()
+	id2, err := conn.Xadd(writers, "*", []client.FieldValue{{Field: "name", Value: "Jane"}, {Field: "surname", Value: "Austen"}}).ToString()
 	assertNil(t, err)
-	err = conn.Xadd(writers, "*", []client.FieldValue{{"name", "Toni"}, {"surname", "Morris"}}).Err()
+	err = conn.Xadd(writers, "*", []client.FieldValue{{Field: "name", Value: "Toni"}, {Field: "surname", Value: "Morris"}}).Err()
 	assertNil(t, err)
-	err = conn.Xadd(writers, "*", []client.FieldValue{{"name", "Agatha"}, {"surname", "Christie"}}).Err()
+	err = conn.Xadd(writers, "*", []client.FieldValue{{Field: "name", Value: "Agatha"}, {Field: "surname", Value: "Christie"}}).Err()
 	assertNil(t, err)
-	err = conn.Xadd(writers, "*", []client.FieldValue{{"name", "Ngozi"}, {"surname", "Adichie"}}).Err()
+	err = conn.Xadd(writers, "*", []client.FieldValue{{Field: "name", Value: "Ngozi"}, {Field: "surname", Value: "Adichie"}}).Err()
 	assertNil(t, err)
 	m, err := conn.Xread(client.Int64Ptr(2), nil, []interface{}{writers}, []string{"0-0"}).ToXread()
 	assertNil(t, err)
 	assertEqual(t, m, map[string][]client.XItem{writers: {
-		{id1, []string{"name", "Virginia", "surname", "Woolf"}},
-		{id2, []string{"name", "Jane", "surname", "Austen"}},
+		{ID: id1, Items: []string{"name", "Virginia", "surname", "Woolf"}},
+		{ID: id2, Items: []string{"name", "Jane", "surname", "Austen"}},
 	}})
 }
 
 func testXrevrange(conn client.Conn, ctx *testCTX, t *testing.T) {
 	writers := ctx.newKey("writers")
-	err := conn.Xadd(writers, "*", []client.FieldValue{{"name", "Virginia"}, {"surname", "Woolf"}}).Err()
+	err := conn.Xadd(writers, "*", []client.FieldValue{{Field: "name", Value: "Virginia"}, {Field: "surname", Value: "Woolf"}}).Err()
 	assertNil(t, err)
-	err = conn.Xadd(writers, "*", []client.FieldValue{{"name", "Jane"}, {"surname", "Austen"}}).Err()
+	err = conn.Xadd(writers, "*", []client.FieldValue{{Field: "name", Value: "Jane"}, {Field: "surname", Value: "Austen"}}).Err()
 	assertNil(t, err)
-	err = conn.Xadd(writers, "*", []client.FieldValue{{"name", "Toni"}, {"surname", "Morris"}}).Err()
+	err = conn.Xadd(writers, "*", []client.FieldValue{{Field: "name", Value: "Toni"}, {Field: "surname", Value: "Morris"}}).Err()
 	assertNil(t, err)
-	err = conn.Xadd(writers, "*", []client.FieldValue{{"name", "Agatha"}, {"surname", "Christie"}}).Err()
+	err = conn.Xadd(writers, "*", []client.FieldValue{{Field: "name", Value: "Agatha"}, {Field: "surname", Value: "Christie"}}).Err()
 	assertNil(t, err)
-	id5, err := conn.Xadd(writers, "*", []client.FieldValue{{"name", "Ngozi"}, {"surname", "Adichie"}}).ToString()
+	id5, err := conn.Xadd(writers, "*", []client.FieldValue{{Field: "name", Value: "Ngozi"}, {Field: "surname", Value: "Adichie"}}).ToString()
 	assertNil(t, err)
 	i, err := conn.Xlen(writers).ToInt64()
 	assertNil(t, err)
 	assertEqual(t, i, 5)
 	slice, err := conn.Xrevrange(writers, "+", "-", client.Int64Ptr(1)).ToXrange()
 	assertNil(t, err)
-	assertEqual(t, slice, []client.XItem{{id5, []string{"name", "Ngozi", "surname", "Adichie"}}})
+	assertEqual(t, slice, []client.XItem{{ID: id5, Items: []string{"name", "Ngozi", "surname", "Adichie"}}})
 }
 
 func testXtrim(conn client.Conn, ctx *testCTX, t *testing.T) {
 	myStream := ctx.newKey("myStream")
-	err := conn.Xadd(myStream, "*", []client.FieldValue{{"field1", "A"}}).Err()
+	err := conn.Xadd(myStream, "*", []client.FieldValue{{Field: "field1", Value: "A"}}).Err()
 	assertNil(t, err)
-	err = conn.Xadd(myStream, "*", []client.FieldValue{{"field2", "B"}}).Err()
+	err = conn.Xadd(myStream, "*", []client.FieldValue{{Field: "field2", Value: "B"}}).Err()
 	assertNil(t, err)
-	id3, err := conn.Xadd(myStream, "*", []client.FieldValue{{"field3", "C"}}).ToString()
+	id3, err := conn.Xadd(myStream, "*", []client.FieldValue{{Field: "field3", Value: "C"}}).ToString()
 	assertNil(t, err)
-	id4, err := conn.Xadd(myStream, "*", []client.FieldValue{{"field4", "D"}}).ToString()
+	id4, err := conn.Xadd(myStream, "*", []client.FieldValue{{Field: "field4", Value: "D"}}).ToString()
 	assertNil(t, err)
 	i, err := conn.Xtrim(myStream, false, 2).ToInt64()
 	assertNil(t, err)
@@ -3388,8 +3381,8 @@ func testXtrim(conn client.Conn, ctx *testCTX, t *testing.T) {
 	slice, err := conn.Xrange(myStream, "-", "+", client.Int64Ptr(2)).ToXrange()
 	assertNil(t, err)
 	assertEqual(t, slice, []client.XItem{
-		{id3, []string{"field3", "C"}},
-		{id4, []string{"field4", "D"}},
+		{ID: id3, Items: []string{"field3", "C"}},
+		{ID: id4, Items: []string{"field4", "D"}},
 	})
 }
 

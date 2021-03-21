@@ -1016,11 +1016,8 @@ func (c *command) ClientTracking(on bool, redirect *int64, prefix []string, bcas
 	if redirect != nil {
 		r.request.cmd = append(r.request.cmd, "REDIRECT", redirect)
 	}
-	if prefix != nil {
-		r.request.cmd = append(r.request.cmd, "PREFIX")
-		for _, v := range prefix {
-			r.request.cmd = append(r.request.cmd, v)
-		}
+	for _, v := range prefix {
+		r.request.cmd = append(r.request.cmd, "PREFIX", v)
 	}
 	if bcast {
 		r.request.cmd = append(r.request.cmd, "BCAST")
@@ -3517,11 +3514,8 @@ func (c *command) Sort(key interface{}, by *string, limit *OffsetCount, get []st
 	if limit != nil {
 		r.request.cmd = append(r.request.cmd, "LIMIT", limit.Offset, limit.Count)
 	}
-	if get != nil {
-		r.request.cmd = append(r.request.cmd, "GET")
-		for _, v := range get {
-			r.request.cmd = append(r.request.cmd, v)
-		}
+	for _, v := range get {
+		r.request.cmd = append(r.request.cmd, "GET", v)
 	}
 	if asc != nil {
 		if *asc {
