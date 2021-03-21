@@ -14,7 +14,7 @@ import (
 // Client related attributes like name and version.
 const (
 	ClientName    = "go-resp3"
-	ClientVersion = "0.11.4"
+	ClientVersion = "0.11.5"
 )
 
 // Environment variables.
